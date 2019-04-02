@@ -1,9 +1,8 @@
 package examples;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
+import com.babelscape.util.POS;
 import com.babelscape.util.UniversalPOS;
 import com.google.common.collect.Multimap;
 
@@ -17,11 +16,13 @@ import it.uniroma1.lcl.babelnet.BabelSynsetComparator;
 import it.uniroma1.lcl.babelnet.BabelSynsetID;
 import it.uniroma1.lcl.babelnet.BabelSynsetRelation;
 import it.uniroma1.lcl.babelnet.InvalidSynsetIDException;
-import it.uniroma1.lcl.babelnet.data.BabelGloss;
-import it.uniroma1.lcl.babelnet.data.BabelImage;
-import it.uniroma1.lcl.babelnet.data.BabelSenseSource;
+import it.uniroma1.lcl.babelnet.data.*;
 import it.uniroma1.lcl.jlt.util.Language;
 import it.uniroma1.lcl.jlt.util.ScoredItem;
+import it.uniroma1.lcl.kb.Domain;
+import it.uniroma1.lcl.kb.Sense;
+import it.uniroma1.lcl.kb.SynsetRelation;
+import it.uniroma1.lcl.kb.SynsetType;
 
 /**
  * A demo class to test {@link BabelNet}'s various features.
@@ -246,22 +247,73 @@ public class BabelNetDemo
 	public static void mainTest()
 	{
 		BabelNet bn = BabelNet.getInstance();
-		String word = "bank";
+		String word = "aplastic anemia";
 		System.out.println("SYNSETS WITH English word: \""+word+"\"");
+
 		List<BabelSynset> synsets = bn.getSynsets(word, Language.EN);
 		Collections.sort(synsets, new BabelSynsetComparator(word));
+
 		for (BabelSynset synset : synsets)
 		{
-			System.out.print("  =>(" + synset.getID() +
-							 "; TYPE: " + synset.getType() +
-							 "; WN SYNSET: " + synset.getWordNetOffsets() + ";\n" +
-							 "  MAIN LEMMA: " + synset.getMainSense(Language.EN) +
-							 ";\n  IMAGES: " + synset.getImages() +
-							 ";\n  CATEGORIES: " + synset.getCategories() +
-							 ";\n  SENSES (Italian): { ");
-			for (BabelSense sense : synset.getSenses(Language.IT))
-				System.out.print(sense.toString()+" "+sense.getPronunciations()+" ");
-			System.out.println("}\n  -----");
+//			System.out.print("  =>(" + synset.getID() +
+//							 "; TYPE: " + synset.getType() +
+//							 "; WN SYNSET: " + synset.getWordNetOffsets() + ";\n" +
+//							 "  MAIN LEMMA: " + synset.getMainSense(Language.EN) +
+//							 ";\n  IMAGES: " + synset.getImages() +
+//							 ";\n  CATEGORIES: " + synset.getCategories() +
+//							 ";\n  SENSES (Italian): { ");
+
+			POS pos = synset.getPOS();
+			List<BabelLemma> lemma=synset.getLemmas(Language.EN);
+			List<BabelCategory> cats=synset.getCategories(Language.EN);
+			Optional<BabelSense> main_sense = synset.getMainSense(Language.EN);
+			Optional<BabelSense> pref_sense = synset.getMainSensePreferrablyIn(Language.EN);
+			List<BabelSenseSource> ssense_sources = synset.getSenseSources();
+			HashMap<Domain, Double> domains=synset.getDomains();
+			List<BabelExample> examples = synset.getExamples();
+			List<BabelExample> en_examlples=synset.getExamples(Language.EN);
+			List<BabelGloss> glosses = synset.getGlosses(Language.EN);
+			boolean is_concept=synset.isKeyConcept();
+			Optional<BabelExample> main_example = synset.getMainExample();
+			List<BabelSynsetRelation> out_edges = synset.getOutgoingEdges();
+			List<BabelSense> senses = synset.getSenses(Language.EN);
+			SynsetType type=synset.getType();
+
+			System.out.println("pos");
+			System.out.println(pos);
+			System.out.println("lemma");
+			System.out.println(lemma);
+			System.out.println("cats");
+			System.out.println(cats);
+			System.out.println("main_sense");
+			System.out.println(main_sense);
+			System.out.println("pref_sense");
+			System.out.println(pref_sense);
+			System.out.println("ssense_sources");
+			System.out.println(ssense_sources);
+			System.out.println("domains");
+			System.out.println(domains);
+			System.out.println("examples");
+			System.out.println(examples);
+			System.out.println("en_examlples");
+			System.out.println(en_examlples);
+			System.out.println("glosses");
+			System.out.println(glosses);
+			System.out.println("is_concept");
+			System.out.println(is_concept);
+			System.out.println("main_example");
+			System.out.println(main_example);
+			System.out.println("out_edges");
+			System.out.println(out_edges);
+			System.out.println("senses");
+			System.out.println(senses);
+			System.out.println("type");
+			System.out.println(type);
+
+
+//			for (BabelSense sense : synset.getSenses(Language.IT))
+//				System.out.print(sense.toString()+" "+sense.getPronunciations()+" ");
+//			System.out.println("}\n  -----");
 		}
 	}
 
@@ -275,42 +327,8 @@ public class BabelNetDemo
 	{
 		try
 		{
-
-		   BabelNet bn = BabelNet.getInstance();
-
-			System.out.println("=== DEMO ===");
-			BabelSynset  synset = bn.getSynset(new BabelSynsetID("bn:03083790n"));
-			System.out.println("Welcome on "+synset.getMainSense(Language.EN).get().getFullLemma().replace("_", " "));
-			System.out.println(synset.getMainGloss(Language.EN).get().getGloss());
-
 			mainTest();
 
-//			testImages("balloon", Language.EN);
-//
-//			System.out.println("===============TESTING BABELNET DICT===============\n");
-//			for (String test : new String[] {
-//					"bank",
-//					"house",
-//					"car",
-//					"account"
-//			}) testDictionary(test, Language.EN, Language.IT);
-//			System.out.println("=====================DONE=====================");
-//
-//			System.out.println("===============TESTING BABELNET GRAPH===============\n");
-//			testGraph("bank", Language.EN);
-//			testGraph("bn:00000010n");
-//			System.out.println("=====================DONE=====================");
-//
-//			System.out.println("===============TESTING BABELNET TRANSLATIONS===============\n");
-//			List<Language> languages = BabelNetConfiguration.getInstance().getBabelLanguages();
-//			languages.add(Language.EN);
-//			testTranslations("apple", Language.EN, languages.toArray(new Language[]{}));
-//			System.out.println("=====================DONE=====================");
-//
-//			System.out.println("===============TESTING BABELNET GLOSSES===============\n");
-//			testGloss("play", Language.EN);
-//			testGloss("bn:00000010n");
-//			System.out.println("=====================DONE=====================");
 
 		}
 		catch (Exception e)
