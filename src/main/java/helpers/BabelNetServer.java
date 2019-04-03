@@ -7,8 +7,8 @@ public class BabelNetServer {
         BabelNetAPI api = new BabelNetAPI();
         post("/", "application/json", (req,res) -> {
             String word = req.queryParams("word");
-            System.out.println("Request in ...");
-            return  api.parse(word);
+            System.out.println("Request in for >>>> "+word);
+            return  api.get_categories(word);
         });
     }
 }
